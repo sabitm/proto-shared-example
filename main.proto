@@ -242,7 +242,7 @@ message DashboardOverviewData {
   SearchSummaryData search_summary = 2;
 }
 message DashboardOverviewResponse {
-  int32 code = 1;
+  int32 number = 1;
   string message = 2;
   DashboardOverviewData data = 3;
 }
