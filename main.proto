@@ -1,0 +1,248 @@
+syntax = "proto3";
+option go_package = "compiled/proto";
+import "google/api/annotations.proto";
+import "account.proto";
+
+service MainService {
+  rpc HealthCheck (NoRequest) returns (GeneralResponse) {
+    option (google.api.http) = {get: "/"};
+  }
+  rpc RequestOTP (RequestOTPRequest) returns (GeneralResponse) {
+    option (google.api.http) = {post: "/v1/request-otp", body: "*"};
+  }
+  rpc ValidateOTP (ValidateOTPRequest) returns (TokenExchangeResponse) {
+    option (google.api.http) = {post: "/v1/validate-otp", body: "*"};
+  }
+  rpc RefreshToken (RefreshTokenRequest) returns (TokenExchangeResponse) {
+    option (google.api.http) = {post: "/v1/refresh-token", body: "*"};
+  }
+  rpc ExportDatabase (ExportDatabaseRequest) returns (GeneralResponse) {
+    option (google.api.http) = {post: "/v1/export-db", body: "*"};
+  }
+  rpc GetAllUsers (TokenRequest) returns (AllUsersResponse) {
+    option (google.api.http) = {get: "/v1/users"};
+  }
+  rpc InviteUser (InviteUserRequest) returns (GeneralResponse) {
+    option (google.api.http) = {post: "/v1/users/invite", body: "body"};
+  }
+  rpc EditUser (EditUserRequest) returns (GeneralResponse) {
+    option (google.api.http) = {put: "/v1/users/edit", body: "body"};
+  }
+  rpc GetAllAccount (GetAllAccountRequest) returns (AllAccountResponse) {
+    option (google.api.http) = {get: "/v1/account"};
+  }
+  rpc InsertAccount (InsertAccountRequest) returns (GeneralResponse) {
+    option (google.api.http) = {post: "/v1/account", body: "body"};
+  }
+  rpc UpdateAccount (UpdateAccountRequest) returns (GeneralResponse) {
+    option (google.api.http) = {put: "/v1/account/{account_id}", body: "body"};
+  }
+  rpc FetchAccountPost (NoRequest) returns (GeneralResponse) {
+    option (google.api.http) = {get: "/v1/fetch"};
+  }
+  rpc InsertSearch (InsertSearchRequest) returns (GeneralResponse) {
+    option (google.api.http) = {post: "/v1/search", body: "body"};
+  }
+  rpc GetSearch (TokenRequest) returns (GetSearchResponse) {
+    option (google.api.http) = {get: "/v1/search"};
+  }
+  rpc RetrieveSearch (RetrieveSearchRequest) returns (RetrieveSearchResponse) {
+    option (google.api.http) = {get: "/v1/search/{search_id}"};
+  }
+  rpc RemoveSearch (RemoveSearchRequest) returns (GeneralResponse) {
+    option (google.api.http) = {delete: "/v1/search/{search_id}"};
+  }
+  rpc FetchKeywordSearch (NoRequest) returns (GeneralResponse) {
+    option (google.api.http) = {get: "/v1/fetch-search"};
+  }
+  rpc GetDashboardOverview (TokenRequest) returns (DashboardOverviewResponse) {
+    option (google.api.http) = {get: "/v1/dashboard"};
+  }
+}
+
+message NoRequest {}
+message GeneralResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message TokenRequest {
+  string token = 1;
+}
+
+message RequestOTPRequest {
+  string email = 1;
+}
+
+message ValidateOTPRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+message RefreshTokenRequest {
+  string refresh = 1;
+}
+
+message TokenExchangeResponse {
+  int32 code = 1;
+  string message = 2;
+  string token = 3;
+  string refresh = 4;
+}
+message ExportDatabaseRequest {
+  string token = 1;
+}
+
+message UserData {
+  string name = 1;
+  string email = 2;
+  string role = 3;
+}
+message AllUsersResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated UserData data = 3;
+}
+
+message InviteUserRequestData {
+  string email = 1;
+  string name = 2;
+}
+message InviteUserRequest {
+  InviteUserRequestData body = 1;
+  string token = 2;
+}
+
+message EditUserRequestData {
+  string email = 1;
+  string role = 2;
+}
+message EditUserRequest {
+  EditUserRequestData body = 1;
+  string token = 2;
+}
+
+message GetAllAccountRequest {
+  int32 page = 1;
+  int32 count = 2;
+  string name = 3;
+  string platform = 4;
+  string token = 5;
+}
+message AllAccountResponse {
+  int32 code = 1;
+  string message = 2;
+  AccountData data = 3;
+}
+
+message InsertAccountRequestData {
+  repeated string username = 1;
+  string platform = 2;
+}
+message InsertAccountRequest {
+  InsertAccountRequestData body = 1;
+  string token = 2;
+}
+
+message UpdateAccountRequestData {
+  string member_type = 2;
+}
+message UpdateAccountRequest {
+  string account_id = 1;
+  UpdateAccountRequestData body = 2;
+  string token = 3;
+}
+
+message AddSearchRequestData {
+  string keyword = 1;
+  repeated int64 accounts = 2;
+  string csv_data = 3;
+}
+message InsertSearchRequest {
+  AddSearchRequestData body = 1;
+  string token = 2;
+}
+
+message GetSearchData {
+  int64 search_id = 1;
+  string keyword = 2;
+  int64 created_at = 3;
+  int64 account_count = 4;
+}
+message GetSearchResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated GetSearchData data = 3;
+}
+
+message RetrieveSearchRequest {
+  int64 search_id = 1;
+  string start_date = 2;
+  string end_date = 3;
+  string token = 4;
+}
+
+message RetrieveSearchResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated SearchPlatformOverviewData data = 3;
+}
+
+message RemoveSearchRequest {
+  int64 search_id = 1;
+  string token = 2;
+}
+
+message SearchPlatformOverviewData {
+  string platform = 1;
+  int64 volume = 2;
+  int64 views = 3;
+  int64 likes = 4;
+  int64 comments = 5;
+  int64 share_count = 6;
+  double er = 7;
+  repeated SearchPostData posts = 8;
+}
+
+message SearchPostData {
+  int64 post_id = 1;
+  int64 account_id = 2;
+  string member_type = 3;
+  string platform = 4;
+  string username = 5;
+  string profile_pic = 6;
+  int64 post_at = 7;
+  string post_uid = 8;
+  string url = 9;
+  string post_type = 10;
+  string thumbnail = 11;
+  string caption = 12;
+  int64 views = 13;
+  int64 likes = 14;
+  int64 comments = 15;
+  int64 share_count = 16;
+  double er = 17;
+  int64 updated_at = 18;
+}
+
+message AccountSummaryData {
+  int64 account_listed = 1;
+  int64 account_drafted = 2;
+  int64 account_tiktok = 3;
+  int64 account_instagram = 4;
+  int64 account_youtube = 5;
+  int64 account_twitter = 6;
+}
+message SearchSummaryData {
+  int64 search_total = 1;
+  repeated string search_keyword = 2;
+}
+message DashboardOverviewData {
+  AccountSummaryData account_summary = 1;
+  SearchSummaryData search_summary = 2;
+}
+message DashboardOverviewResponse {
+  int32 code = 1;
+  string message = 2;
+  DashboardOverviewData data = 3;
+}
